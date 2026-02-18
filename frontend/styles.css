@@ -1,0 +1,144 @@
+/* styles.css */
+body {
+  font-family: 'Arial', sans-serif !important;
+  background-color: #f3f4f6;
+  color: #333;
+  margin: 0;
+  padding: 20px;
+}
+
+h1 {
+  text-align: center;
+  color: #4A4A4A;
+}
+
+img{
+	vertical-align: middle;
+}
+
+.section {
+  padding: 20px;
+  border-radius: 8px;
+  background-color: #fff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+a {
+	color: #000000 !important;
+	text-decoration: none !important;
+}
+a:hover{
+	color: #ddd !important;
+}
+
+.btn-primary,
+.btn-primary:active,
+.btn-primary:visited,
+.btn-primary:focus {
+    background-color: #ff0000 !important;
+    color: white !important;
+    border-color: #C8102E !important;
+}
+
+.btn-primary:hover{
+  background-color: #C8102E !important;
+}
+
+.my-btn-info{
+  padding: 0px !important;
+  padding-bottom: 2px !important;
+}
+
+
+.dropdown-menu a:hover{ 
+  color: white !important;
+  background-color: #FF0000 !important; 
+}
+
+.form-switch .form-check-input:focus {
+  border-color: #FF0000 !important;
+  outline: 0 !important;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(200, 16, 46, 0.6);
+  background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='rgba(0,0,0,0.25)'/></svg>");
+}
+.form-switch .form-check-input:checked {
+  background-color: #FF0000 !important;
+  border-color: #C8102E !important;
+}
+
+textarea:focus,
+input[type="number"]:focus,
+.uneditable-input:focus {   
+  border-color: rgba(200, 16, 46, 0.8);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(200, 16, 46, 0.6);
+  outline: 0 none;
+}
+
+.sm-num {
+  width: 100px !important;
+}
+
+.parent-inline{
+  text-align: center;
+	width: 100%;
+  margin-left: 0px;
+  margin-right: 0px;
+  padding: 0px;
+}
+
+.inline-div {
+  display: inline-block;
+  vertical-align: top;
+  width: 49%;
+  margin-left: 0px;
+  margin-right: 0px;
+  padding: 0px;
+}
+
+.CodeMirror { 
+  text-align: left!important; 
+  height: 100;
+}
+
+.tabs {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  margin-bottom: -1px;
+  text-align: left !important;
+}
+.tab {
+  padding: 5px 10px;
+  background: #ddd;
+  border: 1px solid #bbb;
+  width: fit-content;
+  display: inline-block;
+}
+.tab.active {
+  background: #fff;
+  border-bottom-color: white !important;
+}
+
+.tab-pane {
+  display: none;
+  border: 1px solid #bbb;
+}
+.tab-pane.active { 
+  display: block;
+}
+
+.container-fluid{
+  margin-top: -44px !important;
+  padding-bottom: 5px !important;
+}
+
+.center {
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.spec-button {
+  background: #ddd !important;
+  border: 1px solid #bbb !important;
+}

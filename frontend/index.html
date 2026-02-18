@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+    <meta charset="utf-8">
+    <title>R2U2 Playground</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css">
+    <script language="javascript" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.css"></link>
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/theme/dracula.min.css"></link>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://unpkg.com/d3-dag@1.1.0"></script>
+    <script src="https://cdn.jsdelivr.net/gh/MarketingPipeline/Markdown-Tag/markdown-tag.js"></script> 
+  </head>
+
+<body>
+    <section>
+    <div class = "row">
+      <div class ="col">
+        <div class ="d-inline-flex">
+          <div class = "p-2">
+            <img src="R2U2.png" width="100" height="106" alt=""/>
+          </div>
+          <div class = "p-2 align-self-center">
+            <h3>R2U2 Playground</h3>
+          </div>
+        </div>
+      </div>
+      <div class ="col align-self-center text-end">
+      <div class = "d-inline-flex">
+        <div class = "p-2">
+          <div class="btn-group">
+            <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Examples
+            </button>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" onclick="load_temporal_example()">Temporal</a></li>
+              <li><a class="dropdown-item" onclick="load_AGC_example()">Assume-Guarantee Contracts</a></li>
+              <li><a class="dropdown-item" onclick="load_set_aggregation_example()">Set Aggregation</a></li>
+              <li><a class="dropdown-item" onclick="load_array_example()">Arrays</a></li>
+              <li><a class="dropdown-item" onclick="load_struct_example()">Structs</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="p-2 align-self-center">
+          <a href="https://r2u2.github.io/r2u2">Documentation</a>
+        </div>
+        <div class="p-2 align-self-center">
+          <a href="https://github.com/R2U2/r2u2">GitHub</a>
+        </div>
+      </div>
+    </div>
+  </div>
+	</section>
+  
+	<section>
+    <div class="parent-inline">
+      <div class="inline-div">
+        <div class="tabs-container" id="upper left editor">
+          <ul class="tabs">
+            <li class="tab active" data-tab="0">C2PO Specification            
+              <button class = "btn btn-sm my-btn-info" data-bs-toggle="modal" data-bs-target="#C2POInfo" title="C2POInfo">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#6c757d" class="bi bi-info-circle-fill" viewBox="0 0 16 16">
+                  <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2"/>
+                </svg>
+              </button>
+            </li>
+            <li class="tab" data-tab="1">Assembly
+              <button class = "btn btn-sm my-btn-info" data-bs-toggle="modal" data-bs-target="#AssemblyInfo" title="AssemblyInfo">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#6c757d" class="bi bi-info-circle-fill" viewBox="0 0 16 16">
+                  <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2"/>
+                </svg>
+              </button>
+            </li>
+            <div class="container-fluid text-end">
+              <button class = "btn btn-secondary" onclick="downloadC2POFile()" title="DownloadC2POFile">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
+                  <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5"/>
+                  <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708z"/>
+                </svg>
+              </button>
+              <button class = "btn btn-secondary" data-bs-toggle="modal" data-bs-target="#C2POUploadModal" title="UploadC2POFile">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-upload" viewBox="0 0 16 16">
+                  <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5"/>
+                  <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708z"/>
+                </svg>
+              </button>
+            </div>
+          </ul>
+          <div class="tab-pane active" data-pane="0">
+            <textarea id="c2po"></textarea>
+          </div>
+          <div class="tab-pane" data-pane="1">
+            <textarea id="assembly"></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="inline-div">
+        <div class="tabs-container" id="upper right editor">
+          <ul class="tabs">
+            <li class="tab active" data-tab="3">CSV Trace
+              <button class = "btn btn-sm my-btn-info" data-bs-toggle="modal" data-bs-target="#TraceInfo" title="TraceInfo">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#6c757d" class="bi bi-info-circle-fill" viewBox="0 0 16 16">
+                  <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2"/>
+                </svg>
+              </button>
+            </li>
+            <div class = "container-fluid text-end">
+              <button class = "btn btn-secondary" onclick="downloadCSVFile()" title="DownloadCSVFile">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
+                  <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5"/>
+                  <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708z"/>
+                </svg>
+              </button>
+              <button class = "btn btn-secondary" data-bs-toggle="modal" data-bs-target="#CSVUploadModal" title="UploadCSVFile">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-upload" viewBox="0 0 16 16">
+                  <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5"/>
+                  <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708z"/>
+                </svg>
+              </button>
+            </div>
+          </ul>
+          <div class="tab-pane active" data-pane="3">
+            <textarea id="trace"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+    </section>
+    <section>
+      <div class="d-grid gap-2 d-md-flex justify-content-md-center pt-1">
+        <div class="btn-group">
+          <button type="button" class="btn btn-primary" onclick="compile()">Compile
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
+              <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2z"/>
+              <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466"/>
+            </svg>
+          </button>
+          <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+          </button>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" onclick="downloadSpecBin()">Download spec.bin</a></li>
+            <li><a class="dropdown-item" onclick="downloadCArray()">Download byte array in C</a></li>
+            <li><a class="dropdown-item" onclick="downloadRustArray()">Download byte array in Rust</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#C2POOptionsModal">C2PO Options</a></li>
+          </ul>
+        </div>
+        <button class = "btn btn-primary" onclick="step_back()" title="Step">
+          Step
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-skip-start-fill" viewBox="0 0 16 16">
+            <path d="M4 4a.5.5 0 0 1 1 0v3.248l6.267-3.636c.54-.313 1.232.066 1.232.696v7.384c0 .63-.692 1.01-1.232.697L5 8.753V12a.5.5 0 0 1-1 0z"/>
+          </svg>
+        </button>
+        <button class = "btn btn-primary" onclick="step()" title="Step">
+            Step
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-skip-end-fill" viewBox="0 0 16 16">
+              <path d="M12.5 4a.5.5 0 0 0-1 0v3.248L5.233 3.612C4.693 3.3 4 3.678 4 4.308v7.384c0 .63.692 1.01 1.233.697L11.5 8.753V12a.5.5 0 0 0 1 0z"/>
+            </svg>
+        </button>
+        <button class = "btn btn-primary" onclick="run()" title="Run">
+          Run
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-play-fill" viewBox="0 0 16 16">
+            <path d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393"/>
+          </svg>
+        </button>
+    </div>
+    </section>
+    <section>
+        <div class="tabs-container" id="bottom editor">
+          <ul class="tabs">
+            <li class="tab active" data-tab="4">Output
+              <button class = "btn btn-sm my-btn-info" data-bs-toggle="modal" data-bs-target="#OutputInfo" title="OutputInfo">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#6c757d" class="bi bi-info-circle-fill" viewBox="0 0 16 16">
+                  <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2"/>
+                </svg>
+              </button>
+            </li>
+            <li class="tab" data-tab="5">Timeline</li>
+            <li class="tab" data-tab="6">Tree
+              <button class = "btn btn-sm my-btn-info" data-bs-toggle="modal" data-bs-target="#TreeInfo" title="TreeInfo">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#6c757d" class="bi bi-info-circle-fill" viewBox="0 0 16 16">
+                  <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2"/>
+                </svg>
+              </button>
+            </li>
+            <li class="tab" data-tab="7">Memory Usage</li>
+          </ul>
+          <div class="tab-pane active" data-pane="4">
+            <div class="container-fluid text-end">
+              <button class = "btn btn-secondary" onclick="downloadOutputLog()" title="DownloadOutputLog">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
+                  <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5"/>
+                  <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708z"/>
+                </svg>
+              </button>
+            </div>
+            <textarea id="output"></textarea>
+          </div>
+          <div class="tab-pane" data-pane="5">
+            <div class="container-fluid text-end">
+              <button class = "btn btn-secondary" onclick="downloadGraph()" title="DownloadTimeline">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
+                  <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5"/>
+                  <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708z"/>
+                </svg>
+              </button>
+            </div>
+            <div class="text-center p-2">
+              <button type="button" class="btn spec-button dropdown-toggle" id = "graphSpecSelection" data-bs-toggle="dropdown" aria-expanded="false">
+                Select Specification
+              </button>
+              <ul class="dropdown-menu" id="graphSpecSelection_menu">
+              </ul>
+            </div>
+            <div class="container-fluid text-end">
+              <div class="row g-2 align-items-center justify-content-end">
+                <div class="col-auto">
+                  <label for="Interval" class="col-form-label">Interval:</label>
+                </div>
+                <div class="col-auto sm-num">
+                  <input type="number" id="IntervalStart" class="form-control" value="0" enabled onchange="change_interval_start(this)">
+                </div>
+                <div class="col-auto">
+                  <span id="intervalInline" class="form-text">
+                    to
+                  </span>
+                </div>
+                <div class="col-auto sm-num">
+                  <input type="number" id="IntervalEnd" class="form-control" value="0" enabled onchange="change_interval_end(this)">
+                </div>
+              </div>
+            </div>
+            <div id = "graph-container"></div>
+          </div>
+          <div class="tab-pane" data-pane="6">
+            <div class="container-fluid text-end">
+              <button class = "btn btn-secondary" onclick="downloadAST()" title="DownloadAST">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
+                  <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5"/>
+                  <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708z"/>
+                </svg>
+              </button>
+            </div>
+            <div class="text-center p-2">
+              <button type="button" class="btn spec-button dropdown-toggle" id = "treeSpecSelection" data-bs-toggle="dropdown" aria-expanded="false">
+                Select Specification
+              </button>
+              <ul class="dropdown-menu" id="treeSpecSelection_menu">
+              </ul>
+            </div>
+            <div id = "ast-container"></div>
+          </div>
+          <div class="tab-pane" data-pane="7">
+            <div class="container-fluid text-end">
+              <div class="btn-group">
+                <button class = "btn btn-secondary" onclick="downloadMemoryBounds()" title="DownloadMemoryBounds">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
+                    <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5"/>
+                    <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708z"/>
+                  </svg>
+                </button>
+                <button type="button" class="btn btn-secondary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+                </button>
+                <ul class="dropdown-menu">
+                  <li><a class="dropdown-item" onclick="downloadCBounds()">Download memory bounds in C</a></li>
+                  <li><a class="dropdown-item" onclick="downloadRustBounds()">Download memory bounds in Rust</a></li>
+                </ul>
+              </div>
+            </div>
+            <textarea id="memory"></textarea>
+          </div>
+        </div>
+    </section>
+    <script src="script.js"></script>
+
+    <!-- C2PO Option Dialog Popup -->
+    <div class="modal fade" id="C2POOptionsModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="C2POOptionsModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="C2POOptionsModalLabel">C2PO Options</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" role="switch" id="BooleanizerEnabled" onclick="change_bz_option()"checked>
+              <label class="form-check-label" for="BooleanizerEnabled">Enable Booleanizer</label>
+            </div>
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" role="switch" id="AuxEnabled" onclick="change_aux_option()"checked>
+              <label class="form-check-label" for="AuxEnabled">Enable Auxiliary Data (e.g., specification/contract names)</label>
+            </div>
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" role="switch" id="RewriteEnabled" onclick="change_rewrite_option()"checked>
+              <label class="form-check-label" for="RewriteEnabled">Enable Rewrite Rules</label>
+            </div>
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" role="switch" id="CSEEnabled" onclick="change_cse_option()"checked>
+              <label class="form-check-label" for="CSEEnabled">Enable Common Subexpression Elimination (CSE)</label>
+            </div>
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" role="switch" id="SATEnabled" onclick="change_sat_option(this)">
+              <label class="form-check-label" for="SATEnabled">Enable SAT Checking</label>
+            </div>
+            <div class="row g-3 align-items-center">
+              <div class="col-auto">
+                <label for="SATTimeout" class="col-form-label">SAT Timeout</label>
+              </div>
+              <div class="col-auto">
+                <input type="number" id="SATTimeout" class="form-control" aria-describedby="timeoutHelpInline" value="3600" disabled>
+              </div>
+              <div class="col-auto">
+                <span id="timeoutHelpInline" class="form-text">
+                  in seconds
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Display C2PO Language Info -->
+    <div class="modal fade" id="C2POInfo" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="C2POInfoLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <div class = "p-2">
+              <img src="C2PO.png" width="50" alt=""/>
+            </div>
+            <h1 class="modal-title fs-5" id="&nbsp;C2POInfoModalLabel">C2PO Specification Language Information</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <p>
+              <github-md>
+C2PO offers a structured specification language intended to make writing formal specifications easy
+and transparent. The language is structured into a number of sections for defining inputs, C-style
+structs, macros, and specifications. The most basic C2PO file (i.e., UTF-8 encoded text file with a 
+.c2po extension) is just:
+
+    INPUT
+        a: bool;
+
+    FTSPEC
+        a;
+
+A more complex example file is:
+
+    INPUT
+        a,b: int;
+    
+    DEFINE
+        c := a + b;
+
+    FTSPEC
+        (a > 0) -> F[0,5](c > 5);
+
+Each section has a keyword to denote its beginning:
+
+- `INPUT`: Input signals and their types
+- `STRUCT`: C-like structs
+- `DEFINE`: Macros
+- `FTSPEC`: Future-time MLTL specifications
+- `PTSPEC`: Past-time MLTL specifications
+
+Sections can be declared multiple times and are order-sensitive; in order to refer to an input `x`,
+for example, you must declare it in an `INPUT` section earlier in the file.
+
+## Identifiers
+
+Identifiers are the name of any variable, struct, definition, or formula label. They must be of the
+form
+
+    [a-zA-Z_][a-zA-Z0-9_]*
+
+The following words are reserved words and therefore cannot be used as identifiers:
+
+    STRUCT INPUT DEFINE ATOMIC FTSPEC PTSPEC
+    foreach forsome forexactly foratleast foratmost
+    pow sqrt abs xor rate
+    G F H O U R S M
+    true false
+
+## Types
+
+C2PO supports `bool`, `int`, and `float` basic types and arrays. Arrays are declared using C-style
+syntax, for example, `int[10]`.
+
+C2PO also supports user-definable C-style structs. We can define a struct with members of each type
+as follows:
+
+    STRUCT
+        MyStruct: {
+            my_bool: bool;
+            my_int: int;
+            my_float: float;
+            my_array: int[];
+            my_array_2: int[10];
+        };
+
+Arrays in defined structs can be given either concrete or indeterminate sizes (as in `my_array` or
+`my_array_2`). 
+
+## Inputs
+
+The `INPUT` section is where the input signals for R2U2 are defined. For example:
+
+```
+INPUT
+    p,q: bool;
+    i,j: int;
+    x,y: float;
+    A,B: int[10];
+```
+
+This defines the variables listed as you would expect and these variables are now free to be used in
+any following sections. In order to know which variable corresponds to which input to R2U2, C2PO
+needs a mapping of variables to input vector indices as defined in the top of the CSV trace.
+
+## Supported Operators
+
+C2PO supports the following operators in the table below
+
+| Operator Family | Operator Symbols                        | Signature                                                       | Example(s)         |
+|-----------------|-----------------------------------------|-----------------------------------------------------------------|--------------------|
+| Logical         | !                                     | bool -> bool                                     | !p               |
+|                 | &AMP;&AMP;, \|\|, xor, ==, ->, <->  | bool x bool -> bool                     | p &AMP;&AMP; q           |
+| Relational      | ==, !=                              | bool x bool -> bool                     | p == q           |
+|                 | ==, !=, >, <, >=, <=        | int x int -> bool                       | i <= j           |
+|                 |                                         | float x float -> bool                   | x >= y           |
+| Arithmetic      | -, sqrt, abs                      | int -> int                                       | -i, abs(i)     |
+|                 | -, abs                              | float -> float                                   | -x, sqrt(y)    |
+|                 | +, -, *, /, %, pow          | int x int -> int                        | i + j, i pow j |
+|                 |                                         | float x float -> float                  | x * y, y / x   |
+| Bitwise         | ~                                     | int -> int                                       | ~i               |
+|                 | &AMP;, \|, ^, <<, >>              | int x int -> int                        | i << j, i &AMP; j  |
+| Future-time     | G, F,                               | interval x bool -> bool                 | G[0,5] p         |
+|                 | U, R                                | bool x interval x bool -> bool | p U[3,7] q       |
+| Past-time       | H, O                                | interval x bool -> bool                 | H[2,6] p         |
+|                 | S, T                                | bool x interval x bool -> bool | p S[0,5] q       |
+| Array Index     | []                                    | array x int -> array element type       | A[4]             |
+
+Equality/inequality checks between floats are performed in R2U2 with respect to a value epsilon,
+i.e., `x == y` will be true if | x - y | > epsilon, where epsilon = 0.00001.
+
+Some operators require their arguments to be constants. Division (`/`) requires the right-hand side
+to be constant to avoid division-by-zero errors at runtime and the power operator (`pow`) requires
+the right-hand side to be constant to avoid negative exponents. Array indexes must be a simple
+numeral, no compound, non-constant expressions are allowed.
+
+### Set Aggregation
+
+C2PO also supports *set aggregation*. These operators take a symbol name, array, and expression as
+arguments, applying a conjunction/disjunction to the argument expression for every value in the
+array. For example, to state that some values in `A` are greater than 0: 
+
+    forsome(k: A)(k > 0);
+
+During compilation this is expanded to (where `n` is the size of `A`):
+
+    (A[0] > 0) || (A[2] > 0) || ... || (A[n] > 0);
+
+C2PO supports `foreach`, `forsome`, `forexactly`, `foratleast`, and `foratmost` operators.
+
+## Definitions
+
+The `DEFINE` section allows users to define named expressions. These are essentially treated as
+macros that replace each occurrence of the named expression with its definition during compilation.
+Definitions are of the form:
+
+    symbol := expression ;
+
+For example, using the inputs defined above:
+
+    DEFINE
+        r := p || q;
+        k := i + j;
+        z := x / z;
+
+## Specifications
+
+The `FTPSEC` and `PTSPEC` sections are where specifications for monitoring go. A specification can
+be any expression of `bool` type. For example:
+
+    FTSPEC
+        p U[0,5] q;
+        F[0,5] (i > j);
+
+    PTSPEC
+        O[0,5] (x > y);
+
+In this example, the specification `p U[0,5] q` has ID 0, `F[0,5] (i > j)` has ID 1, and `O[0,5] (x >
+y)` has ID 2. Then if R2U2 outputs `1:3,T` this means that the specification with ID 1 is true at
+time 3.
+
+### Specification Labels
+
+Specifications can have optional labels. This allows them to be used in other specifications. If *Enable Auxiliary Data* 
+is enabled under *Compile > C2PO Options*, then R2U2 will also output the labels in place of
+the ID. For example:
+
+    FTSPEC
+        label:   F[0,3] p;
+        label_2: G[0,3] q || label;
+
+### Assume-Guarantee Contracts
+
+Specifications can also be in the form of assume guarantee contracts (AGCs). AGCs are required to
+have a label and are of the form `assume => guarantee`. They are only allowed to be the top-level
+operator of a specification. For example:
+
+    FTSPEC
+        contract: p => q;
+
+R2U2 will output `inactive` if `p` is false, `invalid` if `p` is true and `q` is false, and
+`verified` if both `p` and `q` are true.
+              </github-md>
+            </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+     <!-- Display Assembly Info -->
+     <div class="modal fade" id="AssemblyInfo" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="AssemblyInfoLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="&nbsp;AssemblyModalLabel">Assembly Information</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+              <github-md>   
+C2PO decomposes formula(s) into subformula nodes represented in an Abstract Syntax Tree (AST). C2PO then outputs 
+assembly-style instructions for R2U2 to reason over. 
+For example, this specification:
+
+    INPUT
+        a,b: bool;
+
+    FTSPEC
+        SPEC0: (G[0,3]a) U[2,4] b;
+
+will result in this AST:
+<img src="SCQ.png" width="200">
+
+Each node in the AST stores the verdict-timestamp tuples required by their parent node(s) in a shared connection queue (SCQ),
+where the SCQ is a circular buffer that overwrites verdict-timestamp tuples in a circular manner.
+
+This will produce the following assembly:
+
+      BZ b0  iload  0 0
+      BZ b1  store  0 0
+      BZ b2  iload  1 0
+      BZ b3  store  2 1
+      TL n0  load   a0
+      TL n1  release False n0
+      TL n2  load   a1
+      TL n3  until  n1 n2
+      TL n4  return n3 0
+      CG TL SCQ q0 |1|
+      CG TL SCQ q1 |5|
+      CG TL TEMP q1 [0, 3]
+      CG TL SCQ q2 |4|
+      CG TL SCQ q3 |5|
+      CG TL TEMP q3 [2, 4]
+      CG TL SCQ q4 |1|
+      F SPEC0 0
+
+
+In the outputted assembly, there are computation instructions and configuration instructions.
+The computation instructions are saved in a table and sequentially iterated over at each timestamp. The computation
+instructions are ordered such that R2U2 reasons over the AST by determining the evaluation of
+each subformula node from the bottom-up and
+propagating verdicts to the parent node(s). The configuration instructions are run once upon initialization to configure the AST in terms of
+sizing and metadata (e.g., the lower and upper bounds of temporal operators). 
+
+## Computation Instructions
+
+In the example above, the following are computation instructions:
+
+      BZ b0  iload  0 0
+      BZ b1  store  0 0
+      BZ b2  iload  1 0
+      BZ b3  store  2 1
+      TL n0  load   a0
+      TL n1  release False n0
+      TL n2  load   a1
+      TL n3  until  n1 n2
+      TL n4  return n3 0
+
+The BZ instructions are run in R2U2's Booleanizer. R2U2’s Booleanizer enables boolean
+expressions over booleans, integers, and/or float input signals using arithmetic, bitwise, relational,
+and set operators (e.g., “forexactlyn” or “foratmostn”). The output of R2U2's booleanizer are atomics that are 
+then read by R2U2's Temporal Logic engine.
+
+The TL instructions are executed in R2U2's Temporal Logic engine, which reasons over MLTL and ptMLTL specifications.
+
+
+## Configuration Instructions
+
+In the example above, the following are configuration instructions:
+
+        CG TL SCQ q0 |1|
+        CG TL SCQ q1 |5|
+        CG TL TEMP q1 [0, 3]
+        CG TL SCQ q2 |4|
+        CG TL SCQ q3 |5|
+        CG TL TEMP q3 [2, 4]
+        CG TL SCQ q4 |1|
+        F SPEC0 0
+
+The `CG TL SCQ ...` instructions give the minimal size required for each of the shared connection queues in order to store the applicable 
+verdict-timestamp tuples required by their parent node(s). 
+
+The `CG TL TEMP ...` instructions give the temporal bounds of the temporal operator nodes.
+
+`F ...` and `C ...` instructions provide the auxilary string name for each formula and contract, respectively. In this example, the formula (G[0,3]a) U[2,4] b
+was given the name `SPEC0`.
+
+              </github-md>
+            </p>
+            </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Display CSV Trace Info -->
+    <div class="modal fade" id="TraceInfo" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="TraceInfoLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="&nbsp;TraceInfoModalLabel">Signal CSV Trace Information</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+              <github-md>   
+A signal trace file is a UTF-8 encoded text file with a `.csv` extension that beings with a header line followed by one or more record lines that specify the values of the signals named in the header at each timestep.
+
+The required header is denoted with a ‘#’ character as the first character of the line followed by comma-separated signal names for each "column" of the signal trace.
+
+The record lines are comma-separated signal values in the same order as named in the header.
+Each line typically represents one time-step, but this is a logical clock and the actual elapsed time between records is not specified.
+
+For example:
+```
+# p,q,i,j,k
+  0,1,5,2,3
+  0,0,4,2,3
+  1,1,2,6,10
+```
+
+One can also define multiple time-steps in a single line, where `@T` is the signal at `T` and since the last `@` symbol. For example,
+the following:
+```
+# p,q,i,j,k
+  0,1,5,2,3
+  0,1,5,2,3
+  0,1,5,2,3
+  0,0,4,2,3
+  0,0,4,2,3
+  1,1,2,6,10
+```
+can also be represented as (note that time starts at 0):
+```
+# p,q,i,j,k
+@2 0,1,5,2,3
+@4 0,0,4,2,3
+@5 1,1,2,6,10
+```
+              </github-md>
+            </p>
+            </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Display Output Info -->
+    <div class="modal fade" id="OutputInfo" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="OutputInfoLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="&nbsp;OutputInfoModalLabel">Output Information</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+              <github-md>   
+The output of R2U2 is a *verdict stream* with one verdict per line. A verdict includes a **formula
+ID**, **timestamp**, and **truth value**. Formula IDs are either determined by the string name specified
+in the spec file (i.e.,  *Enable Auxiliary Data* is enabled under *Compile > C2PO Options*) or determined 
+by the order in which they are defined in the specification file (i.e.,  *Enable Auxiliary Data* is disabled).  Verdicts are *aggregated* so that if R2U2 
+can determine a range of values with the same truth at once, only the last time is output.
+
+The following is a stream where formula SPEC0 is true from 0-7 and false from 8-11 and formula SPEC1 is
+false from times 0-4:
+
+```
+SPEC0:7,T
+SPEC1:4,F
+SPEC0:11,F
+```
+              </github-md>
+            </p>
+            </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Display Tree Info -->
+    <div class="modal fade" id="TreeInfo" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="TreeInfoLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="&nbsp;TreeModalLabel">Abstract Syntax Tree Information</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+              <github-md>   
+R2U2 reasons over formula(s) in an Abstract Syntax Tree (AST) architecture. More specifically, C2PO decomposes formula(s) into subformula nodes represented 
+as an AST.
+
+For example, this specification:
+
+    INPUT
+        a,b: bool;
+
+    FTSPEC
+        SPEC0: (G[0,3]a) U[2,4] b;
+
+will result in this AST:
+<img src="SCQ.png" width="200">
+
+Each node of the AST directly corresponds to an assembly instruction (refer to the Assembly tab for more information).
+
+Inside R2U2, there are two main engines: the **Booleanizer** and the **Temporal Logic Engine**. R2U2’s Booleanizer enables boolean
+expressions over booleans, integers, and/or float input signals using arithmetic, bitwise, relational,
+and set operators (e.g., “forexactlyn” or “foratmostn”). The output of R2U2's booleanizer are atomics that are 
+then read by R2U2's Temporal Logic engine. R2U2's Temporal Logic engine reasons over MLTL and ptMLTL specifications. The AST is 
+color-coded as follows:
+- ![#ADADAD](https://placehold.co/15x15/adadad/adadad.png) grey nodes represent nodes within the Booleanizer. 
+- ![#FF0000](https://placehold.co/15x15/ff0000/ff0000.png) red nodes represent nodes within the Temporal Logic Engine. 
+
+Each node in the AST stores the verdict-timestamp tuples required by their parent node(s) in a shared connection queue (SCQ),
+where the SCQ is a circular buffer that overwrites verdict-timestamp tuples in a circular manner.
+
+              </github-md>
+            </p>
+            </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Upload C2PO File -->
+    <div class="modal fade" id="C2POUploadModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="C2POUploadModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="C2POUploadModalLabel">Upload C2PO Specification File</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="C2POUploadFile" class="form-label">Choose .c2po file:</label>
+              <input class="form-control" type="file" id="C2POUploadFile">
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" onclick="upload_c2po()" data-bs-dismiss="modal">Upload File</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- Upload CSV File -->
+    <div class="modal fade" id="CSVUploadModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="C2POUploadModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="C2POUploadModalLabel">Upload Trace CSV File</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="CSVUploadFile" class="form-label">Choose .csv file:</label>
+              <input class="form-control" type="file" id="CSVUploadFile">
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" onclick="upload_csv()" data-bs-dismiss="modal">Upload File</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+</body>
+
+</html>
