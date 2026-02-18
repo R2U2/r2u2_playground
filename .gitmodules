@@ -1,0 +1,3 @@
+[submodule "backend/r2u2"]
+	path = backend/r2u2
+	url = https://github.com/R2U2/r2u2.git
