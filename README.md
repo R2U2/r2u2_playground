@@ -2,9 +2,10 @@
 
 This provides an interactive playground for the [Realizable, Reconfigurable, Unobtrusive Unit (R2U2)](https://github.com/R2U2/r2u2).
 
-If you would like to cite the R2U2 playground, please use our [2025 FMCAD paper](https://par.nsf.gov/servlets/purl/10663732) ([.bib](https://research.temporallogic.org/BibTeX/ARJ25.bib)).
+More information on the playground is available in our FMCAD 2025 tool paper: [R2U2 Playground: Visualization of a Real-time, Temporal Logic Runtime Monitor](https://par.nsf.gov/servlets/purl/10663732).
 
 # Requirements
+ * Git
  * Docker
 
 # Running R2U2 Playground
