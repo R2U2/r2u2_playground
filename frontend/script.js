@@ -74,6 +74,7 @@ var editor = CodeMirror.fromTextArea(document.getElementById('c2po'), {
   lineNumbers: true,
   gutter: true,
   theme: 'dracula',
+  mode: 'c2po',
 });
 
 var editor2 = CodeMirror.fromTextArea(document.getElementById('assembly'), {
