@@ -1,10 +1,30 @@
 /* styles.css */
+html, body {
+  height: 100%;
+}
+
 body {
   font-family: 'Arial', sans-serif !important;
   background-color: #f3f4f6;
   color: #333;
   margin: 0;
-  padding: 20px;
+  padding: 12px 16px 16px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  overflow: auto;
+}
+
+body > section {
+  flex: 0 0 auto;
+}
+
+body > section.workspace-section {
+  flex: 1 1 auto;
+  min-height: 480px;
+  display: flex;
+  flex-direction: column;
 }
 
 h1 {
@@ -50,7 +70,9 @@ a:hover{
 }
 
 
-.dropdown-menu a:hover{ 
+.dropdown-menu a:hover,
+.dropdown-menu button.dropdown-item:hover,
+.dropdown-menu button.dropdown-item:focus { 
   color: white !important;
   background-color: #FF0000 !important; 
 }
@@ -97,7 +119,7 @@ input[type="number"]:focus,
 
 .CodeMirror { 
   text-align: left!important; 
-  height: 100;
+  height: 100%;
 }
 
 .tabs {
@@ -128,7 +150,7 @@ input[type="number"]:focus,
 }
 
 .container-fluid{
-  margin-top: -44px !important;
+  margin-top: 0 !important;
   padding-bottom: 5px !important;
 }
 
@@ -141,4 +163,279 @@ input[type="number"]:focus,
 .spec-button {
   background: #ddd !important;
   border: 1px solid #bbb !important;
+}
+
+#workspace {
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-x: auto;
+}
+
+#workspace > .pane,
+#workspace > .split-col,
+#workspace > .split-row {
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+}
+
+.split-row {
+  display: flex;
+  flex-direction: row;
+  min-width: 0;
+  min-height: 0;
+}
+
+.split-col {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+
+.pane {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  background: #fff;
+  border: 1px solid #bbb;
+  overflow: visible;
+}
+
+.pane-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.view-panel {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+}
+
+.view-toolbar {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  background: #f8f9fa;
+  border-bottom: 1px solid #ddd;
+  min-width: 0;
+}
+
+.view-picker {
+  flex: 0 0 140px;
+  width: 140px;
+  max-width: 140px;
+  height: 31px;
+}
+
+.pane:has(#view-timeline),
+#view-timeline {
+  min-width: 600px;
+}
+
+#view-timeline .view-toolbar > * {
+  flex-shrink: 0;
+}
+
+#view-timeline .view-toolbar-spacer {
+  display: none;
+}
+
+#view-timeline .spec-button,
+#view-timeline .toolbar-interval,
+#view-timeline .toolbar-interval .col-form-label {
+  white-space: nowrap;
+}
+
+.view-toolbar .btn,
+.view-toolbar .btn-group > .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  height: 31px;
+}
+
+.view-toolbar .btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.view-toolbar .btn-group {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+}
+
+.toolbar-menu {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.toolbar-interval {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 auto;
+}
+
+.toolbar-interval .form-control {
+  width: 72px;
+}
+
+.toolbar-interval .col-form-label,
+.toolbar-interval .form-text {
+  margin: 0;
+  white-space: nowrap;
+}
+
+.view-toolbar-spacer {
+  flex: 1 1 auto;
+  min-width: 8px;
+}
+
+.view-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+  overflow: auto;
+  position: relative;
+}
+
+.view-body > .CodeMirror {
+  height: 100%;
+}
+
+.splitter {
+  flex: 0 0 10px;
+  position: relative;
+  background: #f3f4f6;
+  touch-action: none;
+}
+
+.splitter::before {
+  content: "";
+  position: absolute;
+  background: #c5c9d1;
+  border-radius: 2px;
+}
+
+.splitter.vertical {
+  cursor: col-resize;
+}
+
+.splitter.horizontal {
+  cursor: row-resize;
+}
+
+.splitter.vertical::before {
+  top: 8px;
+  bottom: 8px;
+  left: 4px;
+  width: 2px;
+}
+
+.splitter.horizontal::before {
+  left: 8px;
+  right: 8px;
+  top: 4px;
+  height: 2px;
+}
+
+.splitter:hover::before,
+.splitter.dragging::before {
+  background: #C8102E;
+}
+
+body.resizing-x,
+body.resizing-x * {
+  cursor: col-resize !important;
+  user-select: none !important;
+}
+
+body.resizing-y,
+body.resizing-y * {
+  cursor: row-resize !important;
+  user-select: none !important;
+}
+
+#graph-container,
+#ast-container {
+  position: relative;
+  min-height: 180px;
+}
+
+#graph-container svg,
+#ast-container svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+#view-tree .view-body {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+#ast-container {
+  flex: 1 1 auto;
+  height: 100%;
+  min-height: 0;
+}
+
+#ast-container svg {
+  width: 100%;
+  height: 100%;
+}
+
+#layout-menu.show {
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+  padding: 6px;
+  min-width: 0;
+}
+
+#layout-menu .dropdown-item {
+  width: auto;
+  padding: 6px;
+  border-radius: 4px;
+  line-height: 0;
+}
+
+.layout-icon {
+  width: 32px;
+  height: 22px;
+  display: block;
+}
+
+#layout-button .layout-icon {
+  display: inline-block;
+  width: 22px;
+  height: 16px;
+  vertical-align: middle;
+}
+
+.layout-icon rect {
+  fill: currentColor;
+}
+
+#layout-menu .dropdown-item.active {
+  background-color: #C8102E;
+  color: #fff;
 }
