@@ -171,6 +171,7 @@ input[type="number"]:focus,
   min-width: 0;
   display: flex;
   flex-direction: column;
+  overflow-x: auto;
 }
 
 #workspace > .pane,
@@ -205,20 +206,6 @@ input[type="number"]:focus,
   overflow: visible;
 }
 
-.pane-header {
-  flex: 0 0 auto;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 8px;
-  background: #f8f9fa;
-  border-bottom: 1px solid #ddd;
-}
-
-.view-picker {
-  max-width: 280px;
-}
-
 .pane-body {
   flex: 1 1 auto;
   min-height: 0;
@@ -235,22 +222,90 @@ input[type="number"]:focus,
   min-width: 0;
 }
 
-.view-toolbar,
-.view-controls {
+.view-toolbar {
   flex: 0 0 auto;
   display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
   align-items: center;
   gap: 6px;
   padding: 4px 8px;
-  background: #fff;
+  background: #f8f9fa;
+  border-bottom: 1px solid #ddd;
+  min-width: 0;
 }
 
-.view-controls {
-  display: block;
+.view-picker {
+  flex: 0 0 140px;
+  width: 140px;
+  max-width: 140px;
+  height: 31px;
+}
+
+.pane:has(#view-timeline),
+#view-timeline {
+  min-width: 600px;
+}
+
+#view-timeline .view-toolbar > * {
+  flex-shrink: 0;
+}
+
+#view-timeline .view-toolbar-spacer {
+  display: none;
+}
+
+#view-timeline .spec-button,
+#view-timeline .toolbar-interval,
+#view-timeline .toolbar-interval .col-form-label {
+  white-space: nowrap;
+}
+
+.view-toolbar .btn,
+.view-toolbar .btn-group > .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  height: 31px;
+}
+
+.view-toolbar .btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.view-toolbar .btn-group {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+}
+
+.toolbar-menu {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.toolbar-interval {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 auto;
+}
+
+.toolbar-interval .form-control {
+  width: 72px;
+}
+
+.toolbar-interval .col-form-label,
+.toolbar-interval .form-text {
+  margin: 0;
+  white-space: nowrap;
 }
 
 .view-toolbar-spacer {
   flex: 1 1 auto;
+  min-width: 8px;
 }
 
 .view-body {
@@ -329,6 +384,23 @@ body.resizing-y * {
   width: 100%;
   height: auto;
   display: block;
+}
+
+#view-tree .view-body {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+#ast-container {
+  flex: 1 1 auto;
+  height: 100%;
+  min-height: 0;
+}
+
+#ast-container svg {
+  width: 100%;
+  height: 100%;
 }
 
 #layout-menu.show {

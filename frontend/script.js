@@ -276,8 +276,6 @@ function flexChild(el, ratio) {
 function makePane(slot) {
   var pane = document.createElement('div');
   pane.className = 'pane';
-  var header = document.createElement('div');
-  header.className = 'pane-header';
   var select = document.createElement('select');
   select.className = 'form-select form-select-sm view-picker';
   select.setAttribute('aria-label', 'Choose the view for this box');
@@ -298,14 +296,20 @@ function makePane(slot) {
     workspaceState.assignments[slot] = next;
     renderWorkspace();
   });
-  header.appendChild(select);
   var body = document.createElement('div');
   body.className = 'pane-body';
   var view = document.getElementById('view-' + workspaceState.assignments[slot]);
   if (view) {
+    var toolbar = view.querySelector('.view-toolbar');
+    var existingPicker = view.querySelector('.view-picker');
+    if (existingPicker) {
+      existingPicker.remove();
+    }
+    if (toolbar) {
+      toolbar.insertBefore(select, toolbar.firstChild);
+    }
     body.appendChild(view);
   }
-  pane.appendChild(header);
   pane.appendChild(body);
   return pane;
 }
@@ -542,6 +546,13 @@ function downloadAST(){
   document.body.removeChild(element);
 }
 
+function reportRequestError(error) {
+  console.error('There was a problem with the fetch operation:', error);
+  var detail = (error && error.message) ? error.message : String(error);
+  editor4.setValue('Could not reach the R2U2 backend at http://127.0.0.1:443.\n' + detail);
+  editor4.refresh();
+}
+
 function downloadSpecBin(){
   const request = {
     booleanizer_enabled: document.getElementById('BooleanizerEnabled').checked,
@@ -556,7 +567,7 @@ function downloadSpecBin(){
 
 //console.log(JSON.stringify(request))
 
-fetch('http://0.0.0.0:443/downloadbin', {
+fetch('http://127.0.0.1:443/downloadbin', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json'
@@ -584,7 +595,7 @@ fetch('http://0.0.0.0:443/downloadbin', {
 })
 .catch(error => {
   // Handle errors
-  console.error('There was a problem with the fetch operation:', error);
+  reportRequestError(error);
 });
 }
 
@@ -602,7 +613,7 @@ function downloadCArray(){
 
 //console.log(JSON.stringify(request))
 
-fetch('http://0.0.0.0:443/downloadc', {
+fetch('http://127.0.0.1:443/downloadc', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json'
@@ -630,7 +641,7 @@ fetch('http://0.0.0.0:443/downloadc', {
 })
 .catch(error => {
   // Handle errors
-  console.error('There was a problem with the fetch operation:', error);
+  reportRequestError(error);
 });
 }
 
@@ -648,7 +659,7 @@ function downloadRustArray(){
 
 //console.log(JSON.stringify(request))
 
-fetch('http://0.0.0.0:443/downloadrust', {
+fetch('http://127.0.0.1:443/downloadrust', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json'
@@ -676,7 +687,7 @@ fetch('http://0.0.0.0:443/downloadrust', {
 })
 .catch(error => {
   // Handle errors
-  console.error('There was a problem with the fetch operation:', error);
+  reportRequestError(error);
 });
 }
 
@@ -694,7 +705,7 @@ function downloadCBounds(){
 
 //console.log(JSON.stringify(request))
 
-fetch('http://0.0.0.0:443/downloadcbounds', {
+fetch('http://127.0.0.1:443/downloadcbounds', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json'
@@ -722,7 +733,7 @@ fetch('http://0.0.0.0:443/downloadcbounds', {
 })
 .catch(error => {
   // Handle errors
-  console.error('There was a problem with the fetch operation:', error);
+  reportRequestError(error);
 });
 }
 
@@ -740,7 +751,7 @@ function downloadRustBounds(){
 
 //console.log(JSON.stringify(request))
 
-fetch('http://0.0.0.0:443/downloadrustbounds', {
+fetch('http://127.0.0.1:443/downloadrustbounds', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json'
@@ -768,7 +779,7 @@ fetch('http://0.0.0.0:443/downloadrustbounds', {
 })
 .catch(error => {
   // Handle errors
-  console.error('There was a problem with the fetch operation:', error);
+  reportRequestError(error);
 });
 }
 
@@ -824,7 +835,7 @@ function compile(){
 
   //console.log(JSON.stringify(request))
 
-  fetch('http://0.0.0.0:443/compile', {
+  fetch('http://127.0.0.1:443/compile', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -853,7 +864,7 @@ function compile(){
   })
   .catch(error => {
     // Handle errors
-    console.error('There was a problem with the fetch operation:', error);
+    reportRequestError(error);
   });
 
 }
@@ -873,7 +884,7 @@ async function step(){
       trace_text: editor3.getValue()
     }
 
-    await fetch('http://0.0.0.0:443/run', {
+    await fetch('http://127.0.0.1:443/run', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -903,7 +914,7 @@ async function step(){
     })
     .catch(error => {
       // Handle errors
-      console.error('There was a problem with the fetch operation:', error);
+      reportRequestError(error);
     });
   }
   if (curr_step != -1) {
@@ -964,7 +975,7 @@ function run(){
 
   //console.log(JSON.stringify(request))
 
-  fetch('http://0.0.0.0:443/run', {
+  fetch('http://127.0.0.1:443/run', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -998,7 +1009,7 @@ function run(){
   })
   .catch(error => {
     // Handle errors
-    console.error('There was a problem with the fetch operation:', error);
+    reportRequestError(error);
   });
 
 }
@@ -1665,6 +1676,31 @@ var treeLayout = d3.sugiyama().nodeSize([30,30]).gap([50,50]);
 
 ast.style("opacity", 0);
 
+function fitAstView(nodes) {
+  if (!nodes.length) {
+    return;
+  }
+  var minX = Infinity;
+  var minY = Infinity;
+  var maxX = -Infinity;
+  var maxY = -Infinity;
+  nodes.forEach(function(node) {
+    minX = Math.min(minX, node.x);
+    minY = Math.min(minY, node.y);
+    maxX = Math.max(maxX, node.x);
+    maxY = Math.max(maxY, node.y);
+  });
+  var padX = 90;
+  var padY = 50;
+  var x = minX + ast_margin.left - padX;
+  var y = minY + ast_margin.top - padY;
+  var w = (maxX - minX) + padX * 2;
+  var h = (maxY - minY) + padY * 2;
+  d3.select('#ast')
+    .attr('viewBox', x + ' ' + y + ' ' + w + ' ' + h)
+    .attr('preserveAspectRatio', 'xMidYMid meet');
+}
+
 function change_ast() {
   var spec_name = document.getElementById("treeSpecSelection").textContent;
   if (spec_name.includes("Select Specification")){
@@ -1696,6 +1732,7 @@ function change_ast() {
     treeLayout(dag);
 
     const nodes = dag.nodes();
+    fitAstView(nodes);
 
     var node = ast.selectAll(".node")
       .data(nodes)
