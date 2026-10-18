@@ -117,37 +117,314 @@ editor3.on("change", function() {
   }
 });
 
-var tabs_upper_left = document.getElementById('upper left editor').querySelectorAll('.tab');
+var WORKSPACE_KEY = 'r2u2-playground-workspace';
+var VIEW_DEFS = [
+  { id: 'c2po', label: 'C2PO Specification' },
+  { id: 'assembly', label: 'Assembly' },
+  { id: 'trace', label: 'CSV Trace' },
+  { id: 'output', label: 'R2U2 Output' },
+  { id: 'timeline', label: 'Timeline' },
+  { id: 'tree', label: 'Tree' },
+  { id: 'memory', label: 'Memory Usage' },
+];
+var VIEW_IDS = {};
+VIEW_DEFS.forEach(function(view) { VIEW_IDS[view.id] = true; });
+var LAYOUT_LABELS = {
+  single: 'Single box',
+  vertical: 'Two vertical boxes',
+  horizontal: 'Two horizontal boxes',
+  three: 'Three boxes',
+  four: 'Four boxes',
+};
+var SLOT_COUNT = { single: 1, vertical: 2, horizontal: 2, three: 3, four: 4 };
+var workspaceState = {
+  layout: 'three',
+  assignments: ['c2po', 'trace', 'output', 'assembly'],
+  sizes: {
+    vertical: [0.5, 0.5],
+    horizontal: [0.5, 0.5],
+    threeTop: [0.5, 0.5],
+    threeRows: [0.5, 0.5],
+    fourTop: [0.5, 0.5],
+    fourBottom: [0.5, 0.5],
+    fourRows: [0.5, 0.5],
+  },
+};
 
-for (var i = 0; i < tabs_upper_left.length; i++) {
-  var self = tabs_upper_left[i];
-  self.addEventListener('click', function() {
-    var data = this.getAttribute('data-tab');
-    document.getElementById('upper left editor').querySelectorAll('.tab-pane.active')[0].classList.remove('active');
-    document.getElementById('upper left editor').querySelectorAll('.tab-pane[data-pane="'+data+'"]')[0].classList.add('active');
-    document.getElementById('upper left editor').querySelectorAll('.tab.active')[0].classList.remove('active');
-    this.classList.add('active');
-    if (data == 1){ // Assembly Tab is active
-      editor2.refresh();
+function refreshEditors() {
+  [editor, editor2, editor3, editor4, editor5].forEach(function(cm) {
+    var wrapper = cm.getWrapperElement();
+    if (!wrapper || !wrapper.offsetParent) {
+      return;
     }
+    var parent = wrapper.parentElement;
+    cm.setSize('100%', parent.clientHeight + 'px');
+    cm.refresh();
   });
 }
 
-var tabs_bottom = document.getElementById('bottom editor').querySelectorAll('.tab');
+function sizePair(value, fallback) {
+  if (!Array.isArray(value) || value.length < 2) {
+    return fallback.slice();
+  }
+  var ratio = Number(value[0]);
+  if (!isFinite(ratio)) {
+    return fallback.slice();
+  }
+  ratio = Math.min(0.88, Math.max(0.12, ratio));
+  return [ratio, 1 - ratio];
+}
 
-for (var i = 0; i < tabs_bottom.length; i++) {
-  var self = tabs_bottom[i];
-  self.addEventListener('click', function() {
-    var data = this.getAttribute('data-tab');
-    document.getElementById('bottom editor').querySelectorAll('.tab-pane.active')[0].classList.remove('active');
-    document.getElementById('bottom editor').querySelectorAll('.tab-pane[data-pane="'+data+'"]')[0].classList.add('active');
-    document.getElementById('bottom editor').querySelectorAll('.tab.active')[0].classList.remove('active');
-    this.classList.add('active');
-    if (data == 7){ // Memory Usage Tab is active
-      editor5.refresh();
+function loadWorkspace() {
+  try {
+    var saved = JSON.parse(localStorage.getItem(WORKSPACE_KEY) || 'null');
+    if (!saved || !LAYOUT_LABELS[saved.layout]) {
+      return;
     }
+    workspaceState.layout = saved.layout;
+    if (Array.isArray(saved.assignments)) {
+      saved.assignments.forEach(function(id, index) {
+        if (index < 4 && VIEW_IDS[id]) {
+          workspaceState.assignments[index] = id;
+        }
+      });
+    }
+    var sizes = saved.sizes || {};
+    Object.keys(workspaceState.sizes).forEach(function(key) {
+      workspaceState.sizes[key] = sizePair(sizes[key], workspaceState.sizes[key]);
+    });
+  } catch (err) {
+    workspaceState.layout = 'three';
+  }
+  var used = {};
+  workspaceState.assignments = workspaceState.assignments.map(function(id) {
+    if (!VIEW_IDS[id] || used[id]) {
+      id = VIEW_DEFS.map(function(view) { return view.id; }).find(function(viewId) {
+        return !used[viewId];
+      });
+    }
+    used[id] = true;
+    return id;
   });
 }
+
+function saveWorkspace() {
+  try {
+    localStorage.setItem(WORKSPACE_KEY, JSON.stringify(workspaceState));
+  } catch (err) {
+    // Ignore storage failures so resizing still works.
+  }
+}
+
+function bindSplitter(splitter, onRatio) {
+  splitter.addEventListener('pointerdown', function(event) {
+    if (event.button !== 0) {
+      return;
+    }
+    event.preventDefault();
+    var axis = splitter.classList.contains('vertical') ? 'x' : 'y';
+    var before = splitter.previousElementSibling;
+    var after = splitter.nextElementSibling;
+    var start = axis === 'x' ? event.clientX : event.clientY;
+    var beforeRect = before.getBoundingClientRect();
+    var afterRect = after.getBoundingClientRect();
+    var beforeSize = axis === 'x' ? beforeRect.width : beforeRect.height;
+    var afterSize = axis === 'x' ? afterRect.width : afterRect.height;
+    var total = beforeSize + afterSize;
+    if (total <= 0) {
+      return;
+    }
+    splitter.classList.add('dragging');
+    document.body.classList.add(axis === 'x' ? 'resizing-x' : 'resizing-y');
+    splitter.setPointerCapture(event.pointerId);
+    var frame = 0;
+    function move(ev) {
+      var delta = (axis === 'x' ? ev.clientX : ev.clientY) - start;
+      var min = Math.min(120, total / 2);
+      var next = Math.max(min, Math.min(total - min, beforeSize + delta));
+      var ratio = next / total;
+      before.style.flex = ratio + ' 1 0px';
+      after.style.flex = (1 - ratio) + ' 1 0px';
+      onRatio(ratio);
+      if (!frame) {
+        frame = requestAnimationFrame(function() {
+          frame = 0;
+          refreshEditors();
+        });
+      }
+    }
+    function stop() {
+      splitter.classList.remove('dragging');
+      document.body.classList.remove('resizing-x', 'resizing-y');
+      splitter.removeEventListener('pointermove', move);
+      splitter.removeEventListener('pointerup', stop);
+      splitter.removeEventListener('pointercancel', stop);
+      saveWorkspace();
+      refreshEditors();
+    }
+    splitter.addEventListener('pointermove', move);
+    splitter.addEventListener('pointerup', stop);
+    splitter.addEventListener('pointercancel', stop);
+  });
+}
+
+function flexChild(el, ratio) {
+  el.style.flex = ratio + ' 1 0px';
+  return el;
+}
+
+function makePane(slot) {
+  var pane = document.createElement('div');
+  pane.className = 'pane';
+  var header = document.createElement('div');
+  header.className = 'pane-header';
+  var select = document.createElement('select');
+  select.className = 'form-select form-select-sm view-picker';
+  select.setAttribute('aria-label', 'Choose the view for this box');
+  VIEW_DEFS.forEach(function(view) {
+    var option = document.createElement('option');
+    option.value = view.id;
+    option.textContent = view.label;
+    select.appendChild(option);
+  });
+  select.value = workspaceState.assignments[slot];
+  select.addEventListener('change', function() {
+    var next = select.value;
+    var current = workspaceState.assignments[slot];
+    var other = workspaceState.assignments.indexOf(next);
+    if (other !== -1 && other !== slot) {
+      workspaceState.assignments[other] = current;
+    }
+    workspaceState.assignments[slot] = next;
+    renderWorkspace();
+  });
+  header.appendChild(select);
+  var body = document.createElement('div');
+  body.className = 'pane-body';
+  var view = document.getElementById('view-' + workspaceState.assignments[slot]);
+  if (view) {
+    body.appendChild(view);
+  }
+  pane.appendChild(header);
+  pane.appendChild(body);
+  return pane;
+}
+
+function makeSplitter(kind, onRatio) {
+  var splitter = document.createElement('div');
+  splitter.className = 'splitter ' + kind;
+  splitter.title = 'Drag to resize';
+  bindSplitter(splitter, onRatio);
+  return splitter;
+}
+
+function renderWorkspace() {
+  var count = SLOT_COUNT[workspaceState.layout] || 3;
+  var used = {};
+  for (var i = 0; i < count; i++) {
+    if (!VIEW_IDS[workspaceState.assignments[i]] || used[workspaceState.assignments[i]]) {
+      workspaceState.assignments[i] = VIEW_DEFS.map(function(view) { return view.id; }).find(function(id) {
+        return !used[id];
+      });
+    }
+    used[workspaceState.assignments[i]] = true;
+  }
+  var pool = document.getElementById('view-pool');
+  document.querySelectorAll('.view-panel').forEach(function(view) {
+    pool.appendChild(view);
+  });
+  var ws = document.getElementById('workspace');
+  ws.replaceChildren();
+  var sizes = workspaceState.sizes;
+  if (workspaceState.layout === 'single') {
+    ws.appendChild(makePane(0));
+  } else if (workspaceState.layout === 'vertical') {
+    var stacked = document.createElement('div');
+    stacked.className = 'split-col';
+    stacked.append(
+      flexChild(makePane(0), sizes.vertical[0]),
+      makeSplitter('horizontal', function(ratio) { sizes.vertical = [ratio, 1 - ratio]; }),
+      flexChild(makePane(1), sizes.vertical[1])
+    );
+    ws.appendChild(stacked);
+  } else if (workspaceState.layout === 'horizontal') {
+    var sideBySide = document.createElement('div');
+    sideBySide.className = 'split-row';
+    sideBySide.append(
+      flexChild(makePane(0), sizes.horizontal[0]),
+      makeSplitter('vertical', function(ratio) { sizes.horizontal = [ratio, 1 - ratio]; }),
+      flexChild(makePane(1), sizes.horizontal[1])
+    );
+    ws.appendChild(sideBySide);
+  } else if (workspaceState.layout === 'four') {
+    var topRow = document.createElement('div');
+    topRow.className = 'split-row';
+    topRow.append(
+      flexChild(makePane(0), sizes.fourTop[0]),
+      makeSplitter('vertical', function(ratio) { sizes.fourTop = [ratio, 1 - ratio]; }),
+      flexChild(makePane(1), sizes.fourTop[1])
+    );
+    var bottomRow = document.createElement('div');
+    bottomRow.className = 'split-row';
+    bottomRow.append(
+      flexChild(makePane(2), sizes.fourBottom[0]),
+      makeSplitter('vertical', function(ratio) { sizes.fourBottom = [ratio, 1 - ratio]; }),
+      flexChild(makePane(3), sizes.fourBottom[1])
+    );
+    var grid = document.createElement('div');
+    grid.className = 'split-col';
+    grid.append(
+      flexChild(topRow, sizes.fourRows[0]),
+      makeSplitter('horizontal', function(ratio) { sizes.fourRows = [ratio, 1 - ratio]; }),
+      flexChild(bottomRow, sizes.fourRows[1])
+    );
+    ws.appendChild(grid);
+  } else {
+    workspaceState.layout = 'three';
+    var upper = document.createElement('div');
+    upper.className = 'split-row';
+    upper.append(
+      flexChild(makePane(0), sizes.threeTop[0]),
+      makeSplitter('vertical', function(ratio) { sizes.threeTop = [ratio, 1 - ratio]; }),
+      flexChild(makePane(1), sizes.threeTop[1])
+    );
+    var stack = document.createElement('div');
+    stack.className = 'split-col';
+    stack.append(
+      flexChild(upper, sizes.threeRows[0]),
+      makeSplitter('horizontal', function(ratio) { sizes.threeRows = [ratio, 1 - ratio]; }),
+      flexChild(makePane(2), sizes.threeRows[1])
+    );
+    ws.appendChild(stack);
+  }
+  var layoutButton = document.getElementById('layout-button');
+  var selectedIcon = document.querySelector('#layout-menu [data-layout="' + workspaceState.layout + '"] .layout-icon');
+  var currentIcon = layoutButton.querySelector('.layout-icon');
+  if (currentIcon) {
+    currentIcon.remove();
+  }
+  if (selectedIcon) {
+    layoutButton.insertBefore(selectedIcon.cloneNode(true), layoutButton.firstChild);
+  }
+  layoutButton.setAttribute('aria-label', LAYOUT_LABELS[workspaceState.layout]);
+  document.querySelectorAll('#layout-menu [data-layout]').forEach(function(item) {
+    item.classList.toggle('active', item.dataset.layout === workspaceState.layout);
+  });
+  saveWorkspace();
+  requestAnimationFrame(function() { requestAnimationFrame(refreshEditors); });
+}
+
+loadWorkspace();
+document.getElementById('layout-menu').addEventListener('click', function(event) {
+  var item = event.target.closest('[data-layout]');
+  if (!item) {
+    return;
+  }
+  workspaceState.layout = item.dataset.layout;
+  renderWorkspace();
+});
+renderWorkspace();
+window.addEventListener('resize', refreshEditors);
 
 function remove_ansi_codes(text){
   text = text.replaceAll("\u001b[95m", "");
