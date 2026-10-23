@@ -251,10 +251,6 @@ input[type="number"]:focus,
   flex-shrink: 0;
 }
 
-#view-timeline .view-toolbar-spacer {
-  display: none;
-}
-
 #view-timeline .spec-button,
 #view-timeline .toolbar-interval,
 #view-timeline .toolbar-interval .col-form-label {
